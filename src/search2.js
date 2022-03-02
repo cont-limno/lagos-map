@@ -89,7 +89,7 @@ function outputHtml(matches) {
 
 function searchLakes(searchText, searchType) {
   let matches;
-  parseData("data/lakes.csv", function(data) {
+  parseData("data/extract_1000.csv", function(data) {
     switch (searchType) {
       case "id":
         const idSearch = idFuse(data);

@@ -89,9 +89,10 @@ function toGeoJson(json) {
   }
 }
 
-parseData("data/extract_1000.csv", function(result) {
+function mapData(data) {
   // Add lakes to map
-  lakePts = toGeoJson(result);
+  lakePts = toGeoJson(data);
+  console.log(lakePts);
   lakeLayer = L.geoJSON(lakePts, {
       pointToLayer: (point, latlng) => {
         return L.circleMarker(latlng, {radius: 2});
@@ -124,6 +125,5 @@ parseData("data/extract_1000.csv", function(result) {
   var lakesCheckbox = document.querySelector("#lakes-checkbox");
   lakesCheckbox.addEventListener("mousedown", highlightToggle);
   lakesCheckbox.addEventListener("mouseup", resetHighlight);
-  lakesCheckbox.addEventListener("click", toggleLakes);
-
-});  
+  lakesCheckbox.addEventListener("click", toggleLakes); 
+}

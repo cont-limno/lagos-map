@@ -190,7 +190,7 @@ function interactAllLakes(feature, layer) {
     mouseout: function(e) {
       allLakesLayer.resetStyle(e.target)
       e.target.closeTooltip()},
-    click: function(e) {map.setView(e.target.getLatLng(), 14)}
+    click: function(e) {map.setView(e.target.getLatLng(), map.getZoom() + 2)}
 
   })
 }
@@ -212,8 +212,8 @@ function interactAllLakes(feature, layer) {
 
    // make card with search hints that shows pointer like a link when you hover
    cardsHtml += `
-   <div id="${id}" class="card card-body" style="cursor:pointer;">
-     <p>
+   <div id="${id}" class="card card-body pb-0" style="cursor:pointer;">
+     <p class ="pb-0">
      <span class="text-primary">${id}</span> 
      ${name} 
      (${state})
@@ -238,7 +238,7 @@ function interactAllLakes(feature, layer) {
       elem.classList.remove("bg-info");
     },
     click: function (e) {
-      map.setView(e.target.getLatLng(), map.getZoom() + 2)
+      map.panTo(e.target.getLatLng())
       // TODO: Consider changing color and "pin" to top of list?
     }
 

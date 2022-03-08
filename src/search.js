@@ -63,14 +63,6 @@ function makeSearch(data) {
         layer[i].openPopup();
       });
     }
-
-  //   mapCards = new MapCards(mapFeatures, lakeSearchLayer);
-  //   if (searchText.length == 0) {
-  //     mapFeatures = [];
-  //     matchList.innerHTML = '';
-  //   }
-  //   return(mapFeatures);
-  // }
   }
   return searchData
 }

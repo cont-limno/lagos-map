@@ -68,7 +68,7 @@ searchableMap = function(parseResults) {
   // }); 
 }
 
-Papa.parse("/lagos-map/data/extract_1000.csv", {
+Papa.parse("/lagos-map/data/lakes.csv", {
   // TODO: consider worker option
   download: true,
   header: true,

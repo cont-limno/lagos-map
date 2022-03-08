@@ -51,10 +51,8 @@ searchableMap = function(parseResults) {
   const toggleButton = new LayerToggle(map, allLakesLayer);
 
 
-  // Add lakes to search
+  // Add lake data to search closure
   const searchLakes = makeSearch(lakes);
-
-  // Populate search markers and cards
 
   // accept identifier and search immediately
   idSearch.addEventListener("input", () => searchLakes(idSearch.value, idSearch.id));
@@ -63,7 +61,7 @@ searchableMap = function(parseResults) {
   let timeout = null;
   nameSearch.addEventListener("input", () => {
     clearTimeout(timeout);
-    timeout = setTimeout(searchLakes, 400, nameSearch.value, nameSearch.id);
+    timeout = setTimeout(searchLakes, 1000, nameSearch.value, nameSearch.id);
   }); 
 }
 

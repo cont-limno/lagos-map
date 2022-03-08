@@ -59,6 +59,7 @@ function addMap() {
   const map = L.map("mapdiv", config).setView([lat, lng], zoom);
 
   tnmMap.addTo(map);
+  hydroCached.addTo(map);
 
   var baseLayers = {
     "The National Map": tnmMap

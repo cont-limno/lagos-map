@@ -4,17 +4,36 @@ const listSearch = document.getElementById("list-search");
 const matchList = document.getElementById("match-list");
 
 function makeFuses(data) {
-  const namedData = data.filter(item => item.lake_namelagos != "NA");
+  const namedData = data.filter(item => item.properties.lake_namelagos != "");
+  console.log(data.length);
+  console.log(namedData.length);
   return {
     [idSearch.id]: new Fuse(data, {
-      keys: ["properties.lagoslakeid", "properties.lake_nhdid", "properties.lake_reachcode"],
+      keys: ["properties.lagoslakeid", "properties.lake_nhdid"],
       distance: 0,
       includeScore: true,
     }),
     [nameSearch.id]: new Fuse(namedData, {
-      keys: ["properties.lake_namegnis", "properties.lake_namelagos"], 
+      keys: ["properties.lake_namelagos"], 
       includeScore: true})
   }
+}
+
+function prepList(listString) {
+  if (listString.startsWith("c(") && listString.endsWith(")")) {
+    var parsedString = listString
+      .replace(/[\r\n\t]+/g, '') // remove all whitespace except spaces
+      .replace(/['"]+/g, '') // remove quotes
+      .substring(2, listString.length - 1)
+      .split(',')
+      .join(' ');
+  } else {
+    parsedString = listString
+    .replace(/['"]+/g, '') // remove quotes
+    .split(/\s+/g) // split on any whitespace
+    .join(' ')
+  }
+  return parsedString;
 }
 
 /**
@@ -27,6 +46,7 @@ function makeSearch(data) {
 
   const searchData = function(searchText, searchType) {
     let matches, features, mapCards;
+    matchList.innerHTML = `<div class="spinner-border text-secondary"></div>`
     matches = fuseSearches[searchType]
       .search(searchText)
       .filter(item => item.score < 0.1)

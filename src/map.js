@@ -130,7 +130,7 @@ function interactAllLakes(feature, layer) {
  */
  function interactSearchedLakes(feature, layer) {
    const id = feature.properties.lagoslakeid;
-   const name = feature.properties.lake_namegnis;
+   const name = feature.properties.lake_namelagos;
    const state = feature.properties.lake_centroidstate;
    // make card with search hints that shows pointer like a link when you hover
    cardsHtml += `

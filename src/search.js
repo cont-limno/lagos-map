@@ -4,16 +4,13 @@ const listSearch = document.getElementById("list-search");
 const matchList = document.getElementById("match-list");
 
 function makeFuses(data) {
-  const namedData = data.filter(item => item.properties.lake_namelagos != "");
-  console.log(data.length);
-  console.log(namedData.length);
   return {
     [idSearch.id]: new Fuse(data, {
       keys: ["properties.lagoslakeid", "properties.lake_nhdid"],
       distance: 0,
       includeScore: true,
     }),
-    [nameSearch.id]: new Fuse(namedData, {
+    [nameSearch.id]: new Fuse(data, {
       keys: ["properties.lake_namelagos"], 
       includeScore: true})
   }
@@ -50,6 +47,8 @@ function makeSearch(data) {
     matches = fuseSearches[searchType]
       .search(searchText)
       .filter(item => item.score < 0.1)
+
+    console.log(matches);
     features = matches.map(item => data[item.refIndex]);
 
     // Make search results map layer

@@ -8,11 +8,12 @@ function makeFuses(data) {
     [idSearch.id]: new Fuse(data, {
       keys: ["properties.lagoslakeid", "properties.lake_nhdid"],
       distance: 0,
-      includeScore: true,
+      includeScore: true
     }),
     [nameSearch.id]: new Fuse(data, {
       keys: ["properties.lake_namelagos"], 
-      includeScore: true})
+      includeScore: true
+    })
   }
 }
 
@@ -23,7 +24,7 @@ function prepList(listString) {
       .replace(/['"]+/g, '') // remove quotes
       .substring(2, listString.length - 1)
       .split(',')
-      .join(' ');
+      .join(' =');
   } else {
     parsedString = listString
     .replace(/['"]+/g, '') // remove quotes
@@ -41,14 +42,20 @@ function prepList(listString) {
 function makeSearch(data) {
   const fuseSearches = makeFuses(data);
 
+  /**
+   * Define search event results and behavior.
+   * @param {string} searchText Text to search
+   * @param {string} searchType Type of search. ["id-search", "name-search", "list-search"]
+   * @returns {function} Callback function to pass to event listener with data
+   */
   const searchData = function(searchText, searchType) {
-    let matches, features, mapCards;
+    // Get search results as JSON
+    let matches, features;
     matchList.innerHTML = `<div class="spinner-border text-secondary"></div>`
     matches = fuseSearches[searchType]
       .search(searchText)
       .filter(item => item.score < 0.1)
-
-    console.log(matches);
+    console.log(matches)
     features = matches.map(item => data[item.refIndex]);
 
     // Make search results map layer

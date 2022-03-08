@@ -110,28 +110,106 @@ function addMap() {
 }
 
 /**
- * Set up interactions for "all lakes" layer (circleMarkers)
+ * Define layer pop-up content
+ * @param {Object} feature GeoJSON feature object
+ * @returns {string} Pop-up content
+ */
+function formatPopup(feature) {
+  let { lagoslakeid,
+    lake_nhdid,
+    lake_namelagos,
+    lake_centroidstate,
+    lake_missingws,
+    lake_elevation_m,
+    lake_waterarea_ha,
+    lake_connectivity_class} = feature.properties;
+  if (!lake_namelagos) {
+    lake_namelagos = '(Unnamed)'
+  }
+  return `
+    <table>
+    <tr>
+      <th colspn="2"><h6 class="text-primary">${lake_namelagos}</h6></th>
+    <tr>
+      <td><strong>lagoslakeid</strong></td>
+      <td class="text-primary">${lagoslakeid}</td>
+    </tr>
+    <tr>
+      <td><strong>NHD Permanent_Identifier</strong></td>
+      <td>${lake_nhdid}</td>
+    </tr>
+    <tr>
+      <td><strong>State</strong></td>
+      <td>${lake_centroidstate}</td>
+    </tr>
+    <tr>
+      <td><strong>Missing watersheds?</strong></td>
+      <td>${lake_missingws}</td>
+    </tr>
+    <tr>
+      <td><strong>Elevation (m)</strong></td>
+      <td>${lake_elevation_m}</td>
+    </tr>
+    <tr>
+      <td><strong>Water area (ha)</strong></td>
+      <td>${lake_waterarea_ha}</td>
+    </tr>
+    <tr>
+      <td><strong>Maximum Connectivity</strong></td>
+      <td>${lake_connectivity_class}</td>
+    </tr>
+    </table>
+    `
+}
+
+/**
+ * Define layer tooltip content
+ * @param {Object} feature GeoJSON feature object
+ * @returns {string} Tooltip content
+ */
+function formatTooltip(feature) {
+  const {lake_namelagos, lagoslakeid} = feature.properties;
+  return lake_namelagos ? lake_namelagos + " " + lagoslakeid : lagoslakeid;
+}
+
+/**
+ * Define onEachFeature option for "all lakes" layer (lakesAllLayer)
  * @param {Object} feature GeoJSON feature
  * @param {L.Layer} layer Leaflet Layer instance
  */
 function interactAllLakes(feature, layer) {
+  // Define popups, tools
+  layer.bindPopup(formatPopup(feature));
+  layer.bindTooltip(formatTooltip(feature));
+
+  // Set up listeners
   layer.on({
-    mouseover: function(e) {e.target.setStyle({color:"cyan"})},
-    mouseout: function(e) {allLakesLayer.resetStyle(e.target)},
+    mouseover: function(e) {
+      e.target.setStyle({color:"cyan"})
+      e.target.openTooltip()},
+    mouseout: function(e) {
+      allLakesLayer.resetStyle(e.target)
+      e.target.closeTooltip()},
     click: function(e) {map.setView(e.target.getLatLng(), 14)}
 
   })
 }
 
 /**
- * Set up interactions for lake search results (Markers)
+ * Define onEachFeature for lake search results (lakeSearchLayer)
  * @param {Object} feature GeoJSON feature
  * @param {L.Layer} layer Leaflet Layer instance
  */
  function interactSearchedLakes(feature, layer) {
-   const id = feature.properties.lagoslakeid;
-   const name = feature.properties.lake_namelagos;
-   const state = feature.properties.lake_centroidstate;
+  const id = feature.properties.lagoslakeid;
+  const name = feature.properties.lake_namelagos;
+  const state = feature.properties.lake_centroidstate;
+
+  layer.leafletId = id;
+  layer.bindPopup(formatPopup(feature));
+  layer.bindTooltip(formatTooltip(feature));
+
+
    // make card with search hints that shows pointer like a link when you hover
    cardsHtml += `
    <div id="${id}" class="card card-body" style="cursor:pointer;">
@@ -142,23 +220,20 @@ function interactAllLakes(feature, layer) {
      </p>
    </div>
   `
-
-  layer.leafletId = id;
-  const popup = `<b>Name:</b> ${name} <br><b>ID:</b> ${id}`
-  layer.bindPopup(popup);
-
   //  MARKER event listeners
   layer.on({
     mouseover: function (e) {
       // highlight marker
       e.target.setStyle({color: "lightcyan", stroke: true, fillColor: "cyan"});
       e.target.bringToFront();
+      e.target.openTooltip();
       // get side-bar card
       let elem = document.getElementById(e.target.leafletId);
       elem.classList.add("bg-info");
     },
     mouseout: function (e) {
       allLakesLayer.resetStyle(e.target);
+      e.target.closeTooltip();
       let elem = document.getElementById(e.target.leafletId);
       elem.classList.remove("bg-info");
     },
@@ -170,10 +245,8 @@ function interactAllLakes(feature, layer) {
   })
 }
 
-
-
 /**
- * Manages map search form.
+ * Manage interactions for "Show all lakes" toggle.
  * @constructor
  */
 function LayerToggle(map, layer) {

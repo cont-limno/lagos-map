@@ -41,10 +41,7 @@ searchableMap = function(parseResults) {
   // Add allLakes Layer
   allLakesLayer = L.geoJSON(lakes, {
     pointToLayer: (point, latlng) => L.circleMarker(latlng, {radius: 2}),
-    onEachFeature: interactAllLakes})
-    .bindPopup(layer => {
-    popupContent = '<b>Name:</b>' + layer.feature.properties.lake_namegnis + '<br><b>ID:</b>' + layer.feature.properties.lagoslakeid;
-    return popupContent;
+    onEachFeature: interactAllLakes
   });
   
   // Add toggle button to side-bar form, turns allLakesLayer on/off
@@ -63,6 +60,12 @@ searchableMap = function(parseResults) {
     clearTimeout(timeout);
     timeout = setTimeout(searchLakes, 1000, nameSearch.value, nameSearch.id);
   }); 
+
+  // // accept list of IDs and search after delay
+  // listSearch.addEventListener("input", () => {
+  //   clearTimeout(timeout);
+  //   timeout = setTimeout(searchLakes, 1000, prepList(listSearch.value), listSearch.id);
+  // }); 
 }
 
 Papa.parse("/data/extract_1000.csv", {

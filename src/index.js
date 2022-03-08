@@ -68,7 +68,7 @@ searchableMap = function(parseResults) {
   // }); 
 }
 
-Papa.parse("/data/extract_1000.csv", {
+Papa.parse("./data/extract_1000.csv", {
   // TODO: consider worker option
   download: true,
   header: true,

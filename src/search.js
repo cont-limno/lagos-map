@@ -3,18 +3,17 @@ const nameSearch = document.getElementById("name-search");
 const listSearch = document.getElementById("list-search");
 const matchList = document.getElementById("match-list");
 
-
-// const myData = [
-//   {"lagoslakeid": "123", "lake_nhdid": "456", "lake_reachcode": "000", "lake_namegnis": "pond", "lake_namelagos": "pond"},
-//   {"lagoslakeid": "321", "lake_nhdid": "666", "lake_reachcode": "001", "lake_namegnis": "NA", "lake_namelagos": "NA"}
-// ];
-
-
 function makeFuses(data) {
   const namedData = data.filter(item => item.lake_namelagos != "NA");
   return {
-    [idSearch.id]: new Fuse(data, {keys: ["lagoslakeid", "lake_nhdid", "lake_reachcode"]}),
-    [nameSearch.id]: new Fuse(namedData, {keys: ["lake_namegnis", "lake_namelagos"]})
+    [idSearch.id]: new Fuse(data, {
+      keys: ["properties.lagoslakeid", "properties.lake_nhdid", "properties.lake_reachcode"],
+      distance: 0,
+      includeScore: true,
+    }),
+    [nameSearch.id]: new Fuse(namedData, {
+      keys: ["properties.lake_namegnis", "properties.lake_namelagos"], 
+      includeScore: true})
   }
 }
 
@@ -25,40 +24,53 @@ function makeFuses(data) {
  */
 function makeSearch(data) {
   const fuseSearches = makeFuses(data);
-  return function(searchText, searchType) {
-    let matches;
-    matches = fuseSearches[searchType].search(searchText).slice(0,20);
-    console.log(matches);
-    if (searchText.length == 0) {
-      matches = [];
-      matchList.innerHTML = '';
+
+  const searchData = function(searchText, searchType) {
+    let matches, features, mapCards;
+    matches = fuseSearches[searchType]
+      .search(searchText)
+      .filter(item => item.score < 0.1)
+    features = matches.map(item => data[item.refIndex]);
+
+    // Make search results map layer
+    lakeSearchLayer.clearLayers();
+    lakeSearchLayer = L.geoJSON(features, {
+      pointToLayer: (point, latlng) => L.circleMarker(latlng, {radius: 8, stroke: false, color: "cyan", fillOpacity: 0.9}),
+      onEachFeature: interactSearchedLakes})
+      .addTo(map)
+      .bringToFront();
+
+    // Insert cards HTML
+    matchList.innerHTML = cardsHtml;
+    cardsHtml = '';
+
+    // Bind CARD event listeners to list items
+    cardElems = document.getElementsByClassName("card");
+    for (let i = 0; i < cardElems.length; i++) {
+      cardElems[i].addEventListener("mouseover", function (e) {
+        const layer = lakeSearchLayer.getLayers();
+        layer[i].setStyle({color: "lightcyan", stroke: true, fillColor: "cyan"});
+        cardElems[i].classList.add("bg-info");
+      }, true);
+      cardElems[i].addEventListener("mouseout", function (e) {
+        const hoveredCardId = e.target.id;
+        lakeSearchLayer.resetStyle(lakeSearchLayer.getLayer(hoveredCardId));
+        cardElems[i].classList.remove("bg-info");
+      }, true);
+      cardElems[i].addEventListener("click", function (e) {
+        const layer = lakeSearchLayer.getLayers();
+        map.setView(layer[i].getLatLng(), map.getZoom() + 2);
+        layer[i].openPopup();
+      });
     }
-    outputHtml(matches);
+
+  //   mapCards = new MapCards(mapFeatures, lakeSearchLayer);
+  //   if (searchText.length == 0) {
+  //     mapFeatures = [];
+  //     matchList.innerHTML = '';
+  //   }
+  //   return(mapFeatures);
+  // }
   }
-}
-
-function outputHtml(matches) {
-
-  if (matches.length > 0) {
-    const html = matches.map(match => `
-      <div class="card card-body">
-        <p>
-        <span class="text-primary">${match.item.lagoslakeid}</span> 
-        ${match.item.lake_namegnis} 
-        (${match.item.lake_centroidstate})
-        </p>
-      </div>
-      `
-    )
-    .join('');
-    matchList.innerHTML = html;
-
-    const cardElements = document.querySelectorAll(".card");
-    for (let i = 0; i < cardElements.length; i++) {
-      cardElements[i].addEventListener("click", () => zoomToFeature(matches[i].item))
-
-    } 
-  } else {
-    matchList.innerHTML = "";
-  }
+  return searchData
 }

@@ -14,7 +14,17 @@ function addMap() {
   };
     
   // Configure tile layers
+  const usgsAttr = "<a href='https://www.usgs.gov/'>U.S. Geological Survey</a> | <a href='https://www.usgs.gov/laws/policies_notices.html'>Policies</a>";
+  const nlcdAttr = "<a href = 'https://www.mrlc.gov/'>Multi-Resolution Land Characteristics (MRLC) Consortium</a>"
 
+  // TheNationalMap base layer
+  tnmLink = "https://basemap.nationalmap.gov/arcgis/services/USGSImageryTopo/MapServer/WMSServer?";
+  const tnmOpt = {
+    layers: "0",
+    format: "image/png",
+    attribution: usgsAttr
+  };
+  
   // OSM
   osmLink = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
   osmAttr = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
@@ -24,7 +34,6 @@ function addMap() {
 
   // USGS Hydro Cached
   const hydroCachedLink = "https://basemap.nationalmap.gov/arcgis/services/USGSHydroCached/MapServer/WMSServer";
-  const usgsAttr = "<a href='https://www.usgs.gov/'>U.S. Geological Survey</a> | <a href='https://www.usgs.gov/laws/policies_notices.html'>Policies</a>";
   const hydroCachedOpt= {
     layers: "0",
     format: "image/png",
@@ -32,7 +41,6 @@ function addMap() {
     attribution: usgsAttr
   };
     
-
   // NHD High Res: only appears zoom level 13 or higher
   const nhdHighLink = "https://hydro.nationalmap.gov/arcgis/services/NHDPlus_HR/MapServer/WMSServer?";
   const nhdHighOpt = {
@@ -42,18 +50,22 @@ function addMap() {
     attribution: usgsAttr
   };
     
-  // TheNationalMap base layer
-  tnmLink = "https://basemap.nationalmap.gov/arcgis/services/USGSImageryTopo/MapServer/WMSServer?";
-  const tnmOpt = {
-    layers: "0",
+  // NLCD
+  const nlcdLink = "https://www.mrlc.gov/geoserver/NLCD_Land_Cover/wms?";
+  const nlcdOpt = {
+    layers: "mrlc_display:NLCD_2016_Land_Cover_L48",
     format: "image/png",
-    attribution: usgsAttr
+    transparent: true,
+    attribution: nlcdAttr
   };
+    
 
-  const osmMap = L.tileLayer(osmLink, osmOpt)
+  const osmMap = L.tileLayer(osmLink, osmOpt);
   const tnmMap = L.tileLayer.wms(tnmLink, tnmOpt);
   const hydroCached = L.tileLayer.wms(hydroCachedLink, hydroCachedOpt);
   const nhdHigh = L.tileLayer.wms(nhdHighLink, nhdHighOpt);
+  const nlcd = L.tileLayer.wms(nlcdLink, nlcdOpt);
+  nlcd.setOpacity(0.5);
 
   // Call map and add base layers
   const map = L.map("mapdiv", config).setView([lat, lng], zoom);
@@ -67,7 +79,8 @@ function addMap() {
 
   var overlays = {
     "NHD Medium": hydroCached,
-    "NHD HR": nhdHigh
+    "NHD HR": nhdHigh,
+    "NLCD": nlcd
   };
 
   L.control.layers(baseLayers, overlays).addTo(map);

@@ -52,10 +52,22 @@ function makeSearch(data) {
     // Get search results as JSON
     let matches, features;
     matchList.innerHTML = `<div class="spinner-border text-secondary"></div>`
-    matches = fuseSearches[searchType]
+    if (searchType != 'list-search') {
+      console.log(searchText, searchType);
+      matches = fuseSearches[searchType]
       .search(searchText)
-      .filter(item => item.score < 0.1)
-    features = matches.map(item => data[item.refIndex]);
+      .filter(item => item.score < 0.05)
+      features = matches.map(item => data[item.refIndex]);
+    } else {
+      features = data.filter(feature => prepList(searchText).includes(feature.properties.lagoslakeid));
+    }
+
+    // Add number of results
+    if (features.length == 1) {
+      cardsHtml =`<p class = "text-secondary"><i>${features.length} lake found</i></p>`
+    } else {
+      cardsHtml =`<p class = "text-secondary"><i>${features.length} lakes found</i></p>`
+    }
 
     // Make search results map layer
     lakeSearchLayer.clearLayers();

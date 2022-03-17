@@ -89,13 +89,13 @@ toggle.addEventListener("mouseup", function (e) {
 
 
 
-const searchableMap = function(parseResults) {
+const searchableMap = (fetchResults) => {
   // Data to GeoJSON
-  const lakes = toGeoJson(parseResults.data).features;
+  const lakes = toGeoJson(fetchResults.data).features;
 
   // Assign allLakesLayer
   allLakesLayer = L.geoJSON(lakes, {
-    pointToLayer: (point, latlng) => L.circleMarker(latlng, {radius: 2}),
+    pointToLayer: (point, latlng) => L.circleMarker(latlng, { radius: 2 }),
     onEachFeature: interactAllLakes
   });
 
@@ -106,24 +106,28 @@ const searchableMap = function(parseResults) {
   let timeout = null;
   searchForm = document.querySelector("#search-form");
   searchForm.addEventListener("input", (e) => {
-      let timeout = null;
-      // id search
-      if (e.target.id === "id-search") {
-        searchLakes(e.target.value, e.target.id);
-      // name search
-      } else if (e.target.id == "name-search") {
+    let timeout = null;
+    switch (e.target.id) {
+      case "id-search": searchLakes(e.target.value, e.target.id);
+      break;
+
+      case "name-search":
         clearTimeout(timeout);
         timeout = setTimeout(searchLakes, 1000, e.target.value, e.target.id);
-      // list search
-      } else {
-        // accept list of Ids and search after delay
-        // ???
-      }
+      break;
+
+      case "list-search":
+        clearTimeout(timeout);
+        timeout = setTimeout(searchLakes, 500, e.target.value, e.target.id);
+      break;
+
+      default: // Do nothing
+    }
   });
 
 };
 
-Papa.parse("data/extract_1000.csv", {
+Papa.parse("/lagos-map/data/lakes.csv", {
   // TODO: consider worker option
   download: true,
   header: true,

@@ -129,10 +129,10 @@ function formatPopup(feature) {
   return `
     <table>
     <tr>
-      <th colspn="2"><h6 class="text-primary">${lake_namelagos}</h6></th>
+      <th colspn="2"><h6 class="text-ocean">${lake_namelagos}</h6></th>
     <tr>
       <td><strong>lagoslakeid</strong></td>
-      <td class="text-primary">${lagoslakeid}</td>
+      <td class="text-ocean">${lagoslakeid}</td>
     </tr>
     <tr>
       <td><strong>NHD Permanent_Identifier</strong></td>
@@ -205,19 +205,17 @@ function interactAllLakes(feature, layer) {
   const name = feature.properties.lake_namelagos;
   const state = feature.properties.lake_centroidstate;
 
-  layer.leafletId = id;
+  layer.featureId = id;
   layer.bindPopup(formatPopup(feature));
   layer.bindTooltip(formatTooltip(feature));
 
 
    // make card with search hints that shows pointer like a link when you hover
    cardsHtml += `
-   <div id="${id}" class="card card-body pb-0" style="cursor:pointer;">
-     <p class ="pb-0">
-     <span class="text-primary">${id}</span> 
+   <div id="${id}" class="card card-body p-2 border-ocean" style="cursor:pointer;">
+     <span class="text-ocean">${id}</span> 
      ${name} 
      (${state})
-     </p>
    </div>
   `
   //  MARKER event listeners
@@ -228,58 +226,22 @@ function interactAllLakes(feature, layer) {
       e.target.bringToFront();
       e.target.openTooltip();
       // get side-bar card
-      let elem = document.getElementById(e.target.leafletId);
+      let elem = document.getElementById(e.target.featureId);
       elem.classList.add("bg-info");
     },
     mouseout: function (e) {
       allLakesLayer.resetStyle(e.target);
       e.target.closeTooltip();
-      let elem = document.getElementById(e.target.leafletId);
+      let elem = document.getElementById(e.target.featureId);
       elem.classList.remove("bg-info");
     },
     click: function (e) {
-      map.panTo(e.target.getLatLng())
-      // TODO: Consider changing color and "pin" to top of list?
+      // move card to top of list to ensure visibility
+      map.panTo(e.target.getLatLng());
+      let elem = document.getElementById(e.target.featureId);
+      let matchList = elem.parentElement;
+      matchList.insertBefore(elem, matchList.firstChild);
     }
 
   })
-}
-
-/**
- * Manage interactions for "Show all lakes" toggle.
- * @constructor
- */
-function LayerToggle(map, layer) {
-  this.map = map;
-  this.layer = layer;
-  this.element = document.getElementById("search-form");
-  this.checkbox = document.querySelector("#lakes-checkbox");
-  this.checkboxLabel = this.checkbox.previousElementSibling;
-  this.cardElements = document.querySelectorAll(".card");
-  this.toggleName = 'Show all lakes';
-
-  this.addSpinner = function () {
-    this.checkboxLabel.innerHTML+=' <div class="spinner-border spinner-border-sm text-secondary"></div>';
-  };
-
-  this.removeSpinner = function () {
-    this.checkboxLabel.innerHTML = this.toggleName;
-  };
-
-  this.toggleLayer = function () {
-    if (this.checkbox.checked) {
-      this.layer.addTo(this.map);
-      lakeSearchLayer.bringToFront();
-    } else {
-      this.layer.remove(this.map);
-    }
-  };
-
-  this.addToggleListeners = function () {
-    this.checkbox.addEventListener("mousedown", () => this.addSpinner());
-    this.checkbox.addEventListener("mouseup", () => this.removeSpinner());
-    this.checkbox.addEventListener("click", () => this.toggleLayer()); 
-  };
-
-  this.addToggleListeners(); // automatically add listeners when MapForm is called
 }

@@ -5,7 +5,7 @@ const matchList = document.getElementById("match-list");
 
 function makeFuses(data) {
   return {
-    [idSearch.id]: new Fuse(data, {
+    [idSearch.id]: new Fuse(data, { // computed key
       keys: ["properties.lagoslakeid", "properties.lake_nhdid"],
       distance: 0,
       includeScore: true
@@ -55,7 +55,6 @@ function makeSearch(data) {
     matches = fuseSearches[searchType]
       .search(searchText)
       .filter(item => item.score < 0.1)
-    console.log(matches)
     features = matches.map(item => data[item.refIndex]);
 
     // Make search results map layer
@@ -65,30 +64,16 @@ function makeSearch(data) {
       onEachFeature: interactSearchedLakes})
       .addTo(map)
       .bringToFront();
+    lakeSearchLayer.getFeatureLayer = function(featureId) {
+      return this.getLayers().filter(l => l.featureId === featureId)[0];
+    };
 
     // Insert cards HTML
     matchList.innerHTML = cardsHtml;
     cardsHtml = '';
 
-    // Bind CARD event listeners to list items
-    cardElems = document.getElementsByClassName("card");
-    for (let i = 0; i < cardElems.length; i++) {
-      cardElems[i].addEventListener("mouseover", function (e) {
-        const layer = lakeSearchLayer.getLayers();
-        layer[i].setStyle({color: "lightcyan", stroke: true, fillColor: "cyan"});
-        cardElems[i].classList.add("bg-info");
-      }, true);
-      cardElems[i].addEventListener("mouseout", function (e) {
-        const hoveredCardId = e.target.id;
-        lakeSearchLayer.resetStyle(lakeSearchLayer.getLayer(hoveredCardId));
-        cardElems[i].classList.remove("bg-info");
-      }, true);
-      cardElems[i].addEventListener("click", function (e) {
-        const layer = lakeSearchLayer.getLayers();
-        map.setView(layer[i].getLatLng(), map.getZoom() + 2);
-        layer[i].openPopup();
-      });
-    }
+
+
   }
   return searchData
 }

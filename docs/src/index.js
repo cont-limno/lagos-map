@@ -6,7 +6,10 @@
 // ];
 
 // const testJson = toGeoJson(testData);
-
+let allLakesLayer;
+let cardsHtml = '';
+const map = addMap();
+let lakeSearchLayer = new L.GeoJSON().addTo(map) // add peristent reference to search layer to use in MapCards
 
 function toGeoJson(json) {
   const PointFeatureArray = json.map(
@@ -27,48 +30,100 @@ function toGeoJson(json) {
   }
 }
 
-let allLakesLayer;
-let cardsHtml = '';
-const map = addMap();
-let lakeSearchLayer = new L.GeoJSON().addTo(map) // add peristent reference to search layer to use in MapCards
 
 
-searchableMap = function(parseResults) {
+// EVENT LISTENERS: .card, delegated via #match-list
+matchList.addEventListener("mouseover", function (e) {
+  const card = e.target.closest('.card')
+  if (card) {
+    const layer = lakeSearchLayer.getFeatureLayer(card.id);
+    layer.setStyle({color: "lightcyan", stroke: true, fillColor: "cyan"});
+    card.classList.add("bg-info");
+  }
+}); // Hover on result .card: Highlight card and associated feature marker
 
+matchList.addEventListener("mouseout", function (e) {
+  const card = e.target.closest('.card');
+  if (card) {
+    const layer = lakeSearchLayer.getFeatureLayer(card.id);
+    lakeSearchLayer.resetStyle(layer);
+    card.classList.remove("bg-info");
+  }
+}); // Hover off result .card: Reset highlight on card on associated feature marker
+
+matchList.addEventListener("click", function (e) {
+  const card = e.target.closest('.card');
+  if (card) {
+    const layer = lakeSearchLayer.getFeatureLayer(card.id);
+    map.setView(layer.getLatLng(), map.getZoom() + 2);
+    layer.openPopup();
+  }
+}); // Click on result .card: Slight zoom to feature marker
+
+
+
+// EVENT LISTENERS: #lakes-checkbox All lakes" toggle button
+const toggle = document.querySelector("#lakes-checkbox");
+
+toggle.addEventListener("click", function (e) {
+  const toggle = e.target;
+  if (toggle.checked) {
+    allLakesLayer.addTo(map);
+    allLakesLayer.bringToBack();
+  } else {
+    allLakesLayer.remove(map);
+  }
+}); // Click on "all lakes" toggle: Add/remove all lakes layer on map
+
+toggle.addEventListener("mousedown", function (e) {
+  const toggleLabel = e.target.previousElementSibling;
+  const spinnerDiv = document.createElement("div");
+  spinnerDiv.className = "spinner-border spinner-border-sm text-secondary";
+  toggleLabel.appendChild(spinnerDiv);
+}); // Mousedown on all lakes toggle: Start spinner while waiting for redraw of map
+
+toggle.addEventListener("mouseup", function (e) {
+  const toggleLabel = e.target.previousElementSibling;
+  toggleLabel.removeChild(toggleLabel.querySelector("div"));
+});  // Mouseup on all lakes toggle: Remove spinner when redraw finishes
+
+
+
+const searchableMap = function(parseResults) {
   // Data to GeoJSON
   const lakes = toGeoJson(parseResults.data).features;
 
-  // Add allLakes Layer
+  // Assign allLakesLayer
   allLakesLayer = L.geoJSON(lakes, {
     pointToLayer: (point, latlng) => L.circleMarker(latlng, {radius: 2}),
     onEachFeature: interactAllLakes
   });
-  
-  // Add toggle button to side-bar form, turns allLakesLayer on/off
-  const toggleButton = new LayerToggle(map, allLakesLayer);
 
-
-  // Add lake data to search closure
+  // Create searchLakes closure
   const searchLakes = makeSearch(lakes);
 
-  // accept identifier and search immediately
-  idSearch.addEventListener("input", () => searchLakes(idSearch.value, idSearch.id));
-
-  // accept name and search after delay
+  // EVENT LISTENERS: Search form
   let timeout = null;
-  nameSearch.addEventListener("input", () => {
-    clearTimeout(timeout);
-    timeout = setTimeout(searchLakes, 1000, nameSearch.value, nameSearch.id);
-  }); 
+  searchForm = document.querySelector("#search-form");
+  searchForm.addEventListener("input", (e) => {
+      let timeout = null;
+      // id search
+      if (e.target.id === "id-search") {
+        searchLakes(e.target.value, e.target.id);
+      // name search
+      } else if (e.target.id == "name-search") {
+        clearTimeout(timeout);
+        timeout = setTimeout(searchLakes, 1000, e.target.value, e.target.id);
+      // list search
+      } else {
+        // accept list of Ids and search after delay
+        // ???
+      }
+  });
 
-  // // accept list of IDs and search after delay
-  // listSearch.addEventListener("input", () => {
-  //   clearTimeout(timeout);
-  //   timeout = setTimeout(searchLakes, 1000, prepList(listSearch.value), listSearch.id);
-  // }); 
-}
+};
 
-Papa.parse("/lagos-map/data/lakes.csv", {
+Papa.parse("data/extract_1000.csv", {
   // TODO: consider worker option
   download: true,
   header: true,

@@ -93,32 +93,32 @@ const searchableMap = (fetchResults) => {
   // Data to GeoJSON
   const lakes = toGeoJson(fetchResults.data).features;
 
-  const allLakesTheme = function (feature) {
-    return {}
-  };
-  const connClassTheme = function (feature) {
-    switch (feature.properties.lake_connectivity_class) {
-      case 'Isolated': return {color: "#e41a1c"};
-      case 'Headwater': return {color: "#377eb8"};
-      case 'Drainage': return {color: "#4daf4a"};
-      case 'DrainageLk': return {color: "#984ea3"};
-      case 'Terminal': return {color: "#ff7f00"};
-      case 'TerminalLk': return {color: "#ffff33"};
-  };
-  const elevationTheme = function (feature) {
-    return {
-      fillColor: getColor(feature.properties.elevation_m),
-    }
-  }
+  // const allLakesTheme = function (feature) {
+  //   return {}
+  // };
+  // const connClassTheme = function (feature) {
+  //   switch (feature.properties.lake_connectivity_class) {
+  //     case 'Isolated': return {color: "#e41a1c"};
+  //     case 'Headwater': return {color: "#377eb8"};
+  //     case 'Drainage': return {color: "#4daf4a"};
+  //     case 'DrainageLk': return {color: "#984ea3"};
+  //     case 'Terminal': return {color: "#ff7f00"};
+  //     case 'TerminalLk': return {color: "#ffff33"};
+  // };
+  // const elevationTheme = function (feature) {
+  //   return {
+  //     fillColor: getColor(feature.properties.elevation_m),
+  //   }
+  // }
 
-  const dropdown = document.getElementById("themes");
-  function style() {
-    switch (dropdown.value) {
-      case 'all': return allLakesTheme;
-      case 'conn-class': return connClassTheme;
-      case 'elevation': return elevationTheme;
-    };
-  }
+  // const dropdown = document.getElementById("themes");
+  // function style() {
+  //   switch (dropdown.value) {
+  //     case 'all': return allLakesTheme;
+  //     case 'conn-class': return connClassTheme;
+  //     case 'elevation': return elevationTheme;
+  //   };
+  // }
   // Assign allLakesLayer
   allLakesLayer = L.geoJSON(lakes, {
     pointToLayer: (point, latlng) => L.circleMarker(latlng, { radius: 2 }),
@@ -162,4 +162,4 @@ Papa.parse("/lagos-map/data/lakes.csv", {
   header: true,
   skipEmptyLines: true,
   complete: searchableMap
-})
+});

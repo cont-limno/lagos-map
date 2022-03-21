@@ -122,7 +122,7 @@ const searchableMap = (fetchResults) => {
   // Assign allLakesLayer
   allLakesLayer = L.geoJSON(lakes, {
     pointToLayer: (point, latlng) => L.circleMarker(latlng, { radius: 2 }),
-    style: style(),
+    // style: style(),
     onEachFeature: interactAllLakes
   });
 
@@ -153,6 +153,7 @@ const searchableMap = (fetchResults) => {
   });
 
 };
+
 // "/lagos-map/data/lakes.csv" remote
 // "data/lakes.csv"
 // "data/extract_1000.csv"

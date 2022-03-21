@@ -25,6 +25,9 @@
   #show-all-lakes {
     visibility:hidden;
   }
+  #show-lake-theme {
+    visibility:hidden;
+  }
 </style>
 
 <body>
@@ -43,10 +46,19 @@
         <label for="list-search" class="form-label mt-2">List of lagoslakeids</label> 
         <input type="text" class="form-control" id="list-search" placeholder="1234 567 89012 or c(1234, 567, 89012)" name="id">
 
-        <div class="form-check form-switch mt-2" id="show-all-lakes">
-          <label class="form-check-label" for="lakes-checkbox">Show all lakes </label>
-          <input type="checkbox" class="form-check-input" id="lakes-checkbox" name="showAllLakes" value="no"> 
+        <div class="form-check form-switch mt-3" id="show-all-lakes">
+          <label class="form-check-label" for="lakes-checkbox">Show all lakes</label>
+          <input type="checkbox" class="form-check-input" id="lakes-checkbox" name="showAllLakes" value="no">
         </div>
+        <div id="show-lake-theme" class="form-floating">
+          <select id="themes" class="form-select" aria-label="Select lake theme to view">
+            <option value="all">All lakes</option>
+            <option value="conn-class" selected>(Maximum) Connectivity class</option>
+            <option value="elevation">Lake elevation (m)</option>
+          </select>
+          <label for="themes">Lake theme</label> 
+        </div>
+
       </form>
       <div id="match-list">
       </div>
@@ -61,7 +73,9 @@
 <script src="src/index.js"></script>
 <script>
   var showAllLakes = document.getElementById("show-all-lakes");
+  var showLakeTheme = document.getElementById("show-lake-theme");
   window.addEventListener("load", () => showAllLakes.style.visibility="visible");
+  window.addEventListener("load", () => showLakeTheme.style.visibility="visible");
 </script>
 </body>
 </html>

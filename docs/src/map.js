@@ -14,27 +14,19 @@ function addMap() {
   };
     
   // Configure tile layers
-  const usgsAttr = "<a href='https://www.usgs.gov/'>U.S. Geological Survey</a> | <a href='https://www.usgs.gov/laws/policies_notices.html'>Policies</a>";
-  const nlcdAttr = "<a href = 'https://www.mrlc.gov/'>Multi-Resolution Land Characteristics (MRLC) Consortium</a>"
 
   // TheNationalMap base layer
   tnmLink = "https://basemap.nationalmap.gov/arcgis/services/USGSImageryTopo/MapServer/WMSServer?";
+  const usgsAttr = "<a href='https://www.usgs.gov/'>U.S. Geological Survey</a> | <a href='https://www.usgs.gov/laws/policies_notices.html'>Policies</a>";
   const tnmOpt = {
     layers: "0",
     format: "image/png",
     attribution: usgsAttr
   };
   
-  // OSM
-  osmLink = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-  osmAttr = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-  osmOpt = {
-    attribution: osmAttr
-  };
-
   // USGS Hydro Cached
   const hydroCachedLink = "https://basemap.nationalmap.gov/arcgis/services/USGSHydroCached/MapServer/WMSServer";
-  const hydroCachedOpt= {
+  const hydroCachedOpt = {
     layers: "0",
     format: "image/png",
     transparent: true,
@@ -52,20 +44,55 @@ function addMap() {
     
   // NLCD
   const nlcdLink = "https://www.mrlc.gov/geoserver/NLCD_Land_Cover/wms?";
+  const nlcdAttr = "<a href='https://www.mrlc.gov/'>Multi-Resolution Land Characteristics (MRLC) Consortium</a>";
   const nlcdOpt = {
     layers: "mrlc_display:NLCD_2016_Land_Cover_L48",
     format: "image/png",
     transparent: true,
     attribution: nlcdAttr
   };
+
+  // OSM
+  const osmLink = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+  const osmAttr = "&copy; <a href='https://www.openstreetmap.org/copyright'>OpenStreetMap</a> contributors";
+  osmOpt = {
+    attribution: osmAttr
+  };
+  
+  // WBD
+  const wbdLink = 'https://hydro.nationalmap.gov/arcgis/services/wbd/MapServer/WMSServer?';
+  const wbdOpt = {
+    layers: "2,3,4,5,6,7",
+    format: "image/png",
+    transparent: false,
+    attribution: usgsAttr
+  };
+
+  // WQP
+  //    layers: "wqp_sites:dynamicSites_2429643288, 
+  //wqp_sites:dynamicSites_3888488612, qw_portal_map:fpp, qw_portal_map:nwis_sites, wqp_sites",
+
+  const wqpLink = 'https://www.waterqualitydata.us/ogcservices/wms?';
+  const wqpAttr = "<a href = 'https://www.waterqualitydata.us/orgs/'>Water Quality Portal (ARS, EPA, USGS)</a>"
+  const wqpOpt = {
+    layers: "qw_portal_map:nwis_sites",
+    format: "image/png",
+    transparent: true,
+    attribution: wqpAttr
+  };
     
 
-  const osmMap = L.tileLayer(osmLink, osmOpt);
+
   const tnmMap = L.tileLayer.wms(tnmLink, tnmOpt);
   const hydroCached = L.tileLayer.wms(hydroCachedLink, hydroCachedOpt);
   const nhdHigh = L.tileLayer.wms(nhdHighLink, nhdHighOpt);
   const nlcd = L.tileLayer.wms(nlcdLink, nlcdOpt);
   nlcd.setOpacity(0.5);
+  // const osmMap = L.tileLayer(osmLink, osmOpt);
+  const wbd = L.tileLayer.wms(wbdLink, wbdOpt);
+  wbd.setOpacity(0.5);
+  const wqp = L.tileLayer.wms(wqpLink, wqpOpt);
+
 
   // Call map and add base layers
   const map = L.map("mapdiv", config).setView([lat, lng], zoom);
@@ -80,7 +107,10 @@ function addMap() {
   var overlays = {
     "NHD Medium": hydroCached,
     "NHD HR": nhdHigh,
-    "NLCD": nlcd
+    "NLCD": nlcd,
+    // "Open Street Map": osm,
+    "WBD Hydrologic Units" : wbd,
+    "NWIS Sites" : wqp
   };
 
   L.control.layers(baseLayers, overlays).addTo(map);

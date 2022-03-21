@@ -122,7 +122,6 @@ const searchableMap = (fetchResults) => {
   // Assign allLakesLayer
   allLakesLayer = L.geoJSON(lakes, {
     pointToLayer: (point, latlng) => L.circleMarker(latlng, { radius: 2 }),
-    // style: style(),
     onEachFeature: interactAllLakes
   });
 

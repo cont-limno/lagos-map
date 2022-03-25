@@ -22,6 +22,7 @@
   .bg-image {
     background-image: url("images/lake_background.png");
     background-attachment: fixed;
+    background-position: center top; 
     background-size: cover;
   }
   .trans-box {
@@ -52,7 +53,7 @@
           <h4 class="text-ocean">Search for LAGOS-US lakes</h4>
 
           <label for="id-search" class="form-label">Identifier <br><i>(lagoslakeid OR NHD Permanent_Identifier)</i></label> 
-          <input type="text" class="form-control" id="id-search" placeholder="123456" name="id">
+          <input type="text" class="form-control" id="id-search" placeholder="lagoslakeid OR Permanent_Identifier" name="id">
 
           <label for="name-search" class="form-label mt-2">Name</label> 
           <input type="text" class="form-control" id="name-search" placeholder="GNIS or LAGOS Lake Name" name="id">

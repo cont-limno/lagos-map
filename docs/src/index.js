@@ -132,9 +132,10 @@ const searchableMap = (fetchResults) => {
   let timeout = null;
   searchForm = document.querySelector("#search-form");
   searchForm.addEventListener("input", (e) => {
-    let timeout = null;
     switch (e.target.id) {
-      case "id-search": searchLakes(e.target.value, e.target.id);
+      case "id-search": 
+      clearTimeout(timeout);
+      timeout = setTimeout(searchLakes, 500, e.target.value, e.target.id);
       break;
 
       case "name-search":
@@ -154,9 +155,9 @@ const searchableMap = (fetchResults) => {
 };
 
 // "/lagos-map/data/lakes.csv" remote
-// "data/lakes.csv"
-// "data/extract_1000.csv"
-Papa.parse("/lagos-map/data/lakes.csv", {
+// "data/lakes.csv" local server
+// "data/extract_1000.csv" test file
+Papa.parse("data/extract_1000.csv", {
   // TODO: consider worker option
   download: true,
   header: true,

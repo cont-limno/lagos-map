@@ -20,16 +20,14 @@ function makeFuses(data) {
 function prepList(listString) {
   if (listString.startsWith("c(") && listString.endsWith(")")) {
     var parsedString = listString
-      .replace(/[\r\n\t]+/g, '') // remove all whitespace except spaces
+      .replace(/\s+/g, '') // remove all whitespace except spaces
       .replace(/['"]+/g, '') // remove quotes
-      .substring(2, listString.length - 1)
-      .split(',')
-      .join(' =');
+      .slice(2, this.length - 1)
+      .split(',');
   } else {
     parsedString = listString
     .replace(/['"]+/g, '') // remove quotes
     .split(/\s+/g) // split on any whitespace
-    .join(' ')
   }
   return parsedString;
 }
@@ -59,6 +57,7 @@ function makeSearch(data) {
       .filter(item => item.score < 0.05)
       features = matches.map(item => data[item.refIndex]);
     } else {
+      console.log(prepList(searchText));
       features = data.filter(feature => prepList(searchText).includes(feature.properties.lagoslakeid));
     }
 

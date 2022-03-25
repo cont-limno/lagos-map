@@ -149,6 +149,20 @@ function addMap() {
   const button = document.querySelector(".zoom-all-out");
   button.addEventListener("click", () => map.setView([lat, lng], zoom));
 
+  // Add logo/legend to map
+const legend = L.control({ position: "bottomleft" });
+
+legend.onAdd = function () {
+  let div = L.DomUtil.create("div", "logo-legend");
+  L.DomEvent.disableClickPropagation(div);
+  const text =
+    "<img src='images/lagos-logo2.png' alt='LAGOS logo'>";
+  div.insertAdjacentHTML("beforeend", text);
+  return div;
+};
+
+legend.addTo(map);
+
   return map;
 }
 

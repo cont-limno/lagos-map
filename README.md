@@ -1,4 +1,4 @@
-# lagos-map
+# LAGOS-US Lake Map
 A searchable map showing the context of LAGOS-US lakes.
 
 Use this map to:

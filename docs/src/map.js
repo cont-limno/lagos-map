@@ -107,7 +107,7 @@ function addMap() {
   var overlays = {
     "NHD Medium": hydroCached,
     "NHD HR": nhdHigh,
-    "NLCD": nlcd,
+    "NLCD 2016": nlcd,
     // "Open Street Map": osm,
     "WBD Hydrologic Units" : wbd,
     "NWIS Sites" : wqp
@@ -163,6 +163,9 @@ legend.onAdd = function () {
 
 legend.addTo(map);
 
+// Add scale to map
+L.control.scale({ maxwidth: 300, position: "bottomright" }).addTo(map);
+
   return map;
 }
 
@@ -183,6 +186,8 @@ function formatPopup(feature) {
   if (!lake_namelagos) {
     lake_namelagos = '(Unnamed)'
   }
+  let lake_hasws = lake_missingws === "Y" ? "No" : "Yes"
+
   return `
     <table>
     <tr>
@@ -200,16 +205,16 @@ function formatPopup(feature) {
       <td>${lake_centroidstate}</td>
     </tr>
     <tr>
-      <td><strong>Missing watersheds?</strong></td>
-      <td>${lake_missingws}</td>
+      <td><strong>Has LAGOS Watershed</strong></td>
+      <td>${lake_hasws}</td>
     </tr>
     <tr>
-      <td><strong>Elevation (m)</strong></td>
-      <td>${lake_elevation_m}</td>
+      <td><strong>Elevation</strong></td>
+      <td>${lake_elevation_m}m</td>
     </tr>
     <tr>
-      <td><strong>Water area (ha)</strong></td>
-      <td>${lake_waterarea_ha}</td>
+      <td><strong>Water area</strong></td>
+      <td>${lake_waterarea_ha}ha</td>
     </tr>
     <tr>
       <td><strong>Maximum Connectivity</strong></td>

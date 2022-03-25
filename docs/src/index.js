@@ -87,46 +87,69 @@ toggle.addEventListener("mouseup", function (e) {
   toggleLabel.removeChild(toggleLabel.querySelector("div"));
 });  // Mouseup on all lakes toggle: Remove spinner when redraw finishes
 
-
-
 const searchableMap = (fetchResults) => {
   // Data to GeoJSON
   const lakes = toGeoJson(fetchResults.data).features;
 
-  // const allLakesTheme = function (feature) {
-  //   return {}
-  // };
-  // const connClassTheme = function (feature) {
-  //   switch (feature.properties.lake_connectivity_class) {
-  //     case 'Isolated': return {color: "#e41a1c"};
-  //     case 'Headwater': return {color: "#377eb8"};
-  //     case 'Drainage': return {color: "#4daf4a"};
-  //     case 'DrainageLk': return {color: "#984ea3"};
-  //     case 'Terminal': return {color: "#ff7f00"};
-  //     case 'TerminalLk': return {color: "#ffff33"};
-  // };
-  // const elevationTheme = function (feature) {
-  //   return {
-  //     fillColor: getColor(feature.properties.elevation_m),
-  //   }
-  // }
+  const connClassTheme = function (feature) {
+    switch (feature.properties.lake_connectivity_class) {
+      case 'Isolated': return {color: "#7570b3"};
+      break;
+      case 'Headwater': return {color: "#e7298a"};
+      break;
+      case 'Drainage': return {color: "#66a61e"};
+      break;
+      case 'DrainageLk': return {color: "#1b9e77"};
+      break;
+      case 'Terminal': return {color: "#e6ab02"};
+      break;
+      case 'TerminalLk': return {color: "#d95f02"};
+      break;
+    }
+  };
 
-  // const dropdown = document.getElementById("themes");
-  // function style() {
-  //   switch (dropdown.value) {
-  //     case 'all': return allLakesTheme;
-  //     case 'conn-class': return connClassTheme;
-  //     case 'elevation': return elevationTheme;
-  //   };
-  // }
+  const elevationTheme = function (feature) {
+    const colors = chroma.scale('YlOrRd').gamma(0.3).domain([-90, 4100]); // hard-coded min/max values
+    return {
+      fillColor: colors(feature.properties.lake_elevation_m),
+    }
+  }
+
   // Assign allLakesLayer
   allLakesLayer = L.geoJSON(lakes, {
-    pointToLayer: (point, latlng) => L.circleMarker(latlng, { radius: 2 }),
+    pointToLayer: (point, latlng) => L.circleMarker(latlng, { radius: 2, stroke: false, fillOpacity: 0.9}),
     onEachFeature: interactAllLakes
   });
 
+  function refreshAllLakes(themeValue) {
+    let themeStyle;
+    switch (themeValue) {
+      case 'all': themeStyle = function (feature) {return {}}; // default
+      break;
+      case 'conn-class': themeStyle = connClassTheme;
+      break;
+      case 'elevation': themeStyle = elevationTheme;
+      break;
+    };
+    console.log(themeValue);
+    console.log(themeStyle);
+    allLakesLayer.clearLayers();
+    allLakesLayer = L.geoJSON(lakes, {
+      pointToLayer: (point, latlng) => L.circleMarker(latlng, { radius: 2, stroke: false, fillOpacity: 0.9}),
+      style: themeStyle,
+      onEachFeature: interactAllLakes
+    }).addTo(map);
+
+  }
+
   // Create searchLakes closure
   const searchLakes = makeSearch(lakes);
+
+  // EVENT LISTENERS: #show-lake-theme
+  const themeDropdown = document.querySelector("#themes");
+  themeDropdown.addEventListener("change", function(e) {
+  refreshAllLakes(e.target.value);
+  });
 
   // EVENT LISTENERS: Search form
   let timeout = null;
@@ -154,9 +177,9 @@ const searchableMap = (fetchResults) => {
 
 };
 
-// "/lagos-map/data/lakes.csv" remote
+// "/lagos-map/data/lakes.csv" remote (github.io)
 // "data/lakes.csv" local server
-// "data/extract_1000.csv" test file
+// "data/extract_1000.csv" local test file
 Papa.parse("data/extract_1000.csv", {
   // TODO: consider worker option
   download: true,

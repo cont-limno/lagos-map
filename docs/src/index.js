@@ -117,7 +117,7 @@ const searchableMap = (fetchResults) => {
 
   // Assign allLakesLayer
   allLakesLayer = L.geoJSON(lakes, {
-    pointToLayer: (point, latlng) => L.circleMarker(latlng, { radius: 2, stroke: false, fillOpacity: 0.9}),
+    pointToLayer: (point, latlng) => L.circleMarker(latlng, { radius: 3, stroke: false, fillOpacity: 0.9}),
     onEachFeature: interactAllLakes
   });
 
@@ -135,7 +135,7 @@ const searchableMap = (fetchResults) => {
     console.log(themeStyle);
     allLakesLayer.clearLayers();
     allLakesLayer = L.geoJSON(lakes, {
-      pointToLayer: (point, latlng) => L.circleMarker(latlng, { radius: 2, stroke: false, fillOpacity: 0.9}),
+      pointToLayer: (point, latlng) => L.circleMarker(latlng, { radius: 3, stroke: false, fillOpacity: 0.9}),
       style: themeStyle,
       onEachFeature: interactAllLakes
     }).addTo(map);
@@ -180,7 +180,7 @@ const searchableMap = (fetchResults) => {
 // "/lagos-map/data/lakes.csv" remote (github.io)
 // "data/lakes.csv" local server
 // "data/extract_1000.csv" local test file
-Papa.parse("data/extract_1000.csv", {
+Papa.parse("/lagos-map/data/lakes.csv", {
   // TODO: consider worker option
   download: true,
   header: true,
